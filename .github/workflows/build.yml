@@ -28,6 +28,12 @@ jobs:
           mkdir -p app/src/main/res/values
           mkdir -p gradle/wrapper
 
+          cat << 'EOF' > gradle.properties
+          android.useAndroidX=true
+          android.nonTransitiveRClass=true
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          EOF
+
           cat << 'EOF' > gradle/wrapper/gradle-wrapper.properties
           distributionBase=GRADLE_USER_HOME
           distributionPath=wrapper/dists
@@ -37,39 +43,43 @@ jobs:
           EOF
 
           cat << 'EOF' > settings.gradle
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
           rootProject.name = "HadefApp"
           include ':app'
           EOF
 
           cat << 'EOF' > build.gradle
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.4.0'
-              }
-          }
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+          plugins {
+              id 'com.android.application' version '8.4.0' apply false
           }
           EOF
 
           cat << 'EOF' > app/build.gradle
-          apply plugin: 'com.android.application'
+          plugins {
+              id 'com.android.application'
+          }
 
           android {
               namespace 'com.hadeel.app'
-              compileSdk 36
+              compileSdk 34
 
               defaultConfig {
                   applicationId "com.hadeel.app"
                   minSdk 24
-                  targetSdk 36
+                  targetSdk 34
                   versionCode 5
                   versionName "1.4"
               }
@@ -93,7 +103,7 @@ jobs:
 
           dependencies {
               implementation 'androidx.appcompat:appcompat:1.6.1'
-              implementation 'com.google.android.material:material:1.11.0'
+              implementation 'androidx.webkit:webkit:1.10.0'
           }
           EOF
 
@@ -165,7 +175,7 @@ jobs:
       - name: Build Android App Bundle (AAB)
         run: |
           gradle wrapper --gradle-version 8.6
-          ./gradlew bundleRelease
+          ./gradlew bundleRelease --stacktrace
 
       - name: Upload AAB Artifact
         uses: actions/upload-artifact@v4
