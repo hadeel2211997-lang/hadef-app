@@ -74,14 +74,14 @@ jobs:
 
           android {
               namespace 'com.hadeel.app'
-              compileSdk 34
+              compileSdk 36
 
               defaultConfig {
                   applicationId "com.hadeel.app"
                   minSdk 24
-                  targetSdk 34
-                  versionCode 5
-                  versionName "1.4"
+                  targetSdk 36
+                  versionCode 6
+                  versionName "1.5"
               }
 
               signingConfigs {
@@ -170,7 +170,7 @@ jobs:
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/keystore.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base4 -d > app/keystore.jks 2>/dev/null || echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > app/keystore.jks
 
       - name: Build Android App Bundle (AAB)
         run: |
